@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "resume-matcher-web",
   "compatibility_date": "2026-08-01",
