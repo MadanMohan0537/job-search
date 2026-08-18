@@ -1,51 +1,96 @@
-# Personal Resume Matcher
+# 📄 Personal Resume Matcher — AI Resume Tailoring App
 
-A private, Cloudflare-hosted resume tailoring app adapted from the ideas in [Resume Matcher](https://github.com/srbhr/Resume-Matcher). This version is intentionally single-user and uses Anthropic Claude.
+<p align="center">
+  <strong>A private, serverless resume tailoring app powered by Cloudflare Pages, Cloudflare Workers, and Anthropic Claude.</strong>
+</p>
 
-## What it does
+<p align="center">
+  <a href="#license"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
+  <a href="https://workers.cloudflare.com"><img src="https://img.shields.io/badge/Deployment-Cloudflare%20Workers%20%2B%20Pages-f38020?style=flat-square&logo=cloudflare" alt="Cloudflare"></a>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61dafb?style=flat-square&logo=react" alt="React"></a>
+  <a href="https://anthropic.com"><img src="https://img.shields.io/badge/AI-Anthropic%20Claude-blueviolet?style=flat-square&logo=anthropic" alt="Anthropic Claude"></a>
+</p>
 
-- Extracts text from your master PDF in the browser and retains it in that browser only.
-- Accepts a job URL, with pasted-description fallback for blocked pages.
-- Calls Claude from a Cloudflare Worker; the API key never reaches browser code.
-- Applies truthful, medium-impact XYZ tailoring and downloads an ATS-friendly one-page PDF.
+---
 
-## Architecture
+## 📌 Overview
 
-- `apps/web`: React/Vite frontend deployed to Cloudflare Pages.
-- `apps/worker`: API deployed to Cloudflare Workers.
-- No database, accounts, or multi-user features in v1.
-- Protect both deployments with Cloudflare Access before adding the Anthropic secret.
+**Personal Resume Matcher** is a private, client-side first application designed to match and tailor master resumes against target Job Descriptions. Adapted from the core principles of the open-source [Resume Matcher](https://github.com/srbhr/Resume-Matcher), this architecture is engineered for **strict single-user privacy, serverless edge speed, and zero database overhead**.
 
-## Deploy the Worker
+---
+
+## ✨ Key Features
+
+- **🔒 Client-Side PDF Parsing:** Master resume PDFs are extracted and parsed directly in your browser session using `pdf.js` — your private CV data is never uploaded to an external database.
+- **🎯 Truth-Grounded XYZ Tailoring:** Reformulates verified accomplishments using target JD keywords without fabricating unverified metrics or credentials.
+- **⚡ Protected Serverless Edge API:** Deployed on **Cloudflare Workers**, protecting your Anthropic API key behind encrypted runtime secrets so credentials never touch the browser.
+- **📄 Instant PDF Download:** Produces an ATS-friendly, single-column formatted PDF ready for immediate job application submissions.
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+    A[Master Resume PDF] -->|Client-side PDF.js| B[Browser UI <br>Cloudflare Pages]
+    C[Job Description URL / Text] --> B
+    B -->|Encrypted Payload| D[Cloudflare Worker API]
+    D -->|Protected Secret| E[Anthropic Claude API]
+    E -->|Structured Tailoring Strategy| D
+    D --> B
+    B --> F[ATS-Optimized Tailored PDF Download]
+```
+
+---
+
+## 🚀 Quick Start & Deployment
+
+### 1. Repository Structure
+- `apps/web`: React + Vite single-page application (Cloudflare Pages).
+- `apps/worker`: Cloudflare Worker API proxy and prompt engine.
+
+### 2. Deploy the Worker API
 
 ```bash
-npm install
+# Clone the repository
+git clone https://github.com/MadanMohan0537/Resume-Matcher.git
+cd Resume-Matcher
+
+# Deploy Worker
 cd apps/worker
-npx wrangler login
+npm install
 npx wrangler secret put ANTHROPIC_API_KEY
 npx wrangler deploy
 ```
 
-Set `FRONTEND_ORIGIN` in `wrangler.toml` to the final Pages origin and deploy again. Do not commit `.dev.vars` or the API key.
+### 3. Deploy the Frontend (Cloudflare Pages)
 
-## Deploy the frontend to Pages
+Connect the repository in Cloudflare Pages:
+- **Root Directory:** `apps/web`
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+- **Environment Variable:** `VITE_API_URL=https://resume-matcher-api.<your-subdomain>.workers.dev`
 
-Connect this GitHub repository in Cloudflare Pages and use:
+### 4. Local Development
 
-- Root directory: `apps/web`
-- Build command: `npm install && npm run build`
-- Output directory: `dist`
-- Environment variable: `VITE_API_URL=https://resume-matcher-api.<your-subdomain>.workers.dev`
+```bash
+# Terminal 1: Run Worker locally
+cd apps/worker && npm run dev
 
-Then put both the Pages hostname and Worker hostname behind a Cloudflare Access policy restricted to your email address.
+# Terminal 2: Run Web Frontend
+cd apps/web && npm run dev
+```
 
-## Local checks
+---
 
-Copy `.dev.vars.example` to `.dev.vars` only for local Worker testing and `.env.example` to `.env` for the frontend. Run `npm run dev:worker` and `npm run dev:web` in separate terminals.
+## 🛡️ Privacy & Security Design
 
-## Security notes
+1. **Zero Database Retention:** No applicant tracking data or master resumes are stored on a server.
+2. **Encrypted Runtime Secrets:** Anthropic API keys are bound as Cloudflare runtime secrets.
+3. **SSRF Guard:** Worker URL fetching blocks local network IPs and loops.
 
-- The Claude key is a Worker secret, never a frontend environment variable.
-- The master resume is stored in browser local storage, not uploaded for permanent storage.
-- Job-page fetching rejects common local/private hostnames and limits fetched content.
-- Cloudflare Access is required because this personal build intentionally has no in-app account system.
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
