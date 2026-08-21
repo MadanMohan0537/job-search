@@ -11,6 +11,7 @@
     "build:web": "npm run build -w apps/web",
     "build:worker": "npm run typecheck -w apps/worker",
     "build": "npm run build:web && npm run build:worker",
+    "deploy": "npm run build && wrangler deploy",
     "deploy:web": "npm run build -w apps/web && wrangler deploy --config apps/web/wrangler.jsonc",
     "deploy:worker": "npm run typecheck -w apps/worker && wrangler deploy --config apps/worker/wrangler.toml"
   }
