@@ -1,7 +1,114 @@
-interface Env { ANTHROPIC_API_KEY:string; FRONTEND_ORIGIN:string }
-const json=(data:unknown,status=200,origin='*')=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','access-control-allow-origin':origin,'access-control-allow-headers':'content-type','access-control-allow-methods':'POST,OPTIONS'}});
-const cleanHtml=(html:string)=>html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim().slice(0,50000);
-const allowedUrl=(value:string)=>{const u=new URL(value);if(!['http:','https:'].includes(u.protocol))throw new Error('Unsupported URL');const h=u.hostname.toLowerCase();if(h==='localhost'||h==='127.0.0.1'||h==='0.0.0.0'||h.endsWith('.local'))throw new Error('Private URLs are not allowed');return u};
-async function jobFromUrl(value:string){const u=allowedUrl(value);const r=await fetch(u.toString(),{headers:{'user-agent':'Mozilla/5.0 ResumeMatcher/1.0'},redirect:'follow',signal:AbortSignal.timeout(12000)});if(!r.ok)throw new Error('I could not access the complete job description from that link. Please paste the job description.');const text=cleanHtml(await r.text());if(text.length<500)throw new Error('I could not access the complete job description from that link. Please paste the job description.');return text}
-const system=`You are a truthful resume tailoring engine. Return only valid JSON. The master resume is the sole factual source. Never invent employers, titles, dates, education, certifications, skills, responsibilities, metrics, tools, industries, or authorization. Moderately tailor wording and ordering to the job. Use concise XYZ-style bullets when supported, without creating metrics. Fit a readable single-column one-page US Letter resume. Preserve name and contact details. Output exactly: {"jobTitle":"","company":"","resume":{"name":"","contact":"","summary":"","skills":[""],"experience":[{"heading":"","bullets":[""]}],"education":[""],"certifications":[""]}}. Keep summary under 45 words, skills under 18 items, total experience bullets at most 10, each bullet under 24 words.`;
-export default {async fetch(req:Request,env:Env){const origin=env.FRONTEND_ORIGIN||'*';if(req.method==='OPTIONS')return json({},204,origin);const url=new URL(req.url);if(url.pathname==='/api/health')return json({ok:true},200,origin);if(url.pathname!=='/api/tailor'||req.method!=='POST')return json({error:'Not found'},404,origin);try{const body=await req.json() as {masterResume?:string;jobUrl?:string;jobDescription?:string};if(!body.masterResume?.trim())return json({error:'Master resume is required.'},400,origin);let job=body.jobDescription?.trim()||'';if(!job&&body.jobUrl)job=await jobFromUrl(body.jobUrl);if(!job)return json({error:'Job URL or description is required.'},400,origin);const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,temperature:.2,system,messages:[{role:'user',content:`MASTER RESUME:\n${body.masterResume.slice(0,40000)}\n\nJOB POSTING:\n${job.slice(0,40000)}`}]})});const data=await r.json() as any;if(!r.ok)throw new Error(data?.error?.message||'Claude request failed.');const raw=data.content?.find((x:any)=>x.type==='text')?.text||'';const parsed=JSON.parse(raw.replace(/^```json\s*|\s*```$/g,''));return json(parsed,200,origin)}catch(e:any){return json({error:e.message||'Unexpected error'},500,origin)}}};
+interface Env {
+  ANTHROPIC_API_KEY: string;
+  FRONTEND_ORIGIN?: string;
+  ASSETS: Fetcher;
+}
+
+const json = (data: unknown, status = 200, origin = '*') =>
+  new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'content-type': 'application/json',
+      'access-control-allow-origin': origin,
+      'access-control-allow-headers': 'content-type',
+      'access-control-allow-methods': 'POST,OPTIONS',
+    },
+  });
+
+const cleanHtml = (html: string) =>
+  html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 50000);
+
+const allowedUrl = (value: string) => {
+  const u = new URL(value);
+  if (!['http:', 'https:'].includes(u.protocol)) throw new Error('Unsupported URL');
+  const h = u.hostname.toLowerCase();
+  if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.endsWith('.local')) {
+    throw new Error('Private URLs are not allowed');
+  }
+  return u;
+};
+
+async function jobFromUrl(value: string) {
+  const u = allowedUrl(value);
+  const r = await fetch(u.toString(), {
+    headers: { 'user-agent': 'Mozilla/5.0 ResumeMatcher/1.0' },
+    redirect: 'follow',
+    signal: AbortSignal.timeout(12000),
+  });
+  if (!r.ok) throw new Error('I could not access the complete job description from that link. Please paste the job description.');
+  const text = cleanHtml(await r.text());
+  if (text.length < 500) throw new Error('I could not access the complete job description from that link. Please paste the job description.');
+  return text;
+}
+
+const system = `You are a truthful resume tailoring engine. Return only valid JSON. The master resume is the sole factual source. Never invent employers, titles, dates, education, certifications, skills, responsibilities, metrics, tools, industries, or authorization. Moderately tailor wording and ordering to the job. Use concise XYZ-style bullets when supported, without creating metrics. Fit a readable single-column one-page US Letter resume. Preserve name and contact details. Output exactly: {"jobTitle":"","company":"","resume":{"name":"","contact":"","summary":"","skills":[""],"experience":[{"heading":"","bullets":[""]}],"education":[""],"certifications":[""]}}. Keep summary under 45 words, skills under 18 items, total experience bullets at most 10, each bullet under 24 words.`;
+
+export default {
+  async fetch(req: Request, env: Env) {
+    const url = new URL(req.url);
+    const requestOrigin = req.headers.get('origin') || '*';
+    const origin = env.FRONTEND_ORIGIN || requestOrigin;
+
+    if (url.pathname.startsWith('/api/')) {
+      if (req.method === 'OPTIONS') return json({}, 204, origin);
+      if (url.pathname === '/api/health' && req.method === 'GET') return json({ ok: true }, 200, origin);
+      if (url.pathname !== '/api/tailor' || req.method !== 'POST') return json({ error: 'Not found' }, 404, origin);
+
+      try {
+        if (!env.ANTHROPIC_API_KEY) return json({ error: 'ANTHROPIC_API_KEY is not configured.' }, 500, origin);
+
+        const body = (await req.json()) as {
+          masterResume?: string;
+          jobUrl?: string;
+          jobDescription?: string;
+        };
+
+        if (!body.masterResume?.trim()) return json({ error: 'Master resume is required.' }, 400, origin);
+
+        let job = body.jobDescription?.trim() || '';
+        if (!job && body.jobUrl) job = await jobFromUrl(body.jobUrl);
+        if (!job) return json({ error: 'Job URL or description is required.' }, 400, origin);
+
+        const r = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'x-api-key': env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 4000,
+            temperature: 0.2,
+            system,
+            messages: [
+              {
+                role: 'user',
+                content: `MASTER RESUME:\n${body.masterResume.slice(0, 40000)}\n\nJOB POSTING:\n${job.slice(0, 40000)}`,
+              },
+            ],
+          }),
+        });
+
+        const data = (await r.json()) as any;
+        if (!r.ok) throw new Error(data?.error?.message || 'Claude request failed.');
+
+        const raw = data.content?.find((x: any) => x.type === 'text')?.text || '';
+        const parsed = JSON.parse(raw.replace(/^```json\s*|\s*```$/g, ''));
+        return json(parsed, 200, origin);
+      } catch (e: any) {
+        return json({ error: e.message || 'Unexpected error' }, 500, origin);
+      }
+    }
+
+    return env.ASSETS.fetch(req);
+  },
+};
