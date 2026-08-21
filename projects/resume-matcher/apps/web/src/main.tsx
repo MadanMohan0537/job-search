@@ -6,7 +6,7 @@ import { jsPDF } from 'jspdf';
 import './styles.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+const API = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 
 type Resume = {name:string; contact:string; summary:string; skills:string[]; experience:{heading:string; bullets:string[]}[]; education:string[]; certifications?:string[]};
 
