@@ -1,0 +1,4 @@
+interface:
+  display_name: "Resume Matcher"
+  short_description: "Tailor a truthful resume to a target role"
+  default_prompt: "Use $resume-matcher to tailor my resume to this job description without inventing facts."

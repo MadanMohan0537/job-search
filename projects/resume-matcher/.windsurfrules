@@ -1,0 +1,8 @@
+# Windsurf Cascade Rules: Resume Matcher & Builder
+
+When working on resume tailoring and review:
+- Strictly adhere to verified master resume facts. Do not hallucinate metrics, credentials, or achievements.
+- Enforce the Google XYZ and TAR formulas: Action verb + Shipped feature/scope + Quantified outcome.
+- Provide a 1-line company context line under each company header.
+- Enforce ATS-friendly single-column layout with standard headings.
+- Consult `skills/references/` for archetype metrics, common pitfalls, and template guidelines.
