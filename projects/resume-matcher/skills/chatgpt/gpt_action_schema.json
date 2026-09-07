@@ -1,0 +1,78 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Resume Matcher API",
+    "description": "Truth-grounded multi-model resume matching and tailoring API",
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://your-resume-matcher.workers.dev",
+      "description": "Cloudflare Worker Deployment"
+    }
+  ],
+  "paths": {
+    "/api/tailor": {
+      "post": {
+        "operationId": "tailorResume",
+        "summary": "Match and tailor a master resume against a target job posting",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "masterResume": {
+                    "type": "string",
+                    "description": "The candidate's verified master resume text"
+                  },
+                  "jobDescription": {
+                    "type": "string",
+                    "description": "The target job posting text"
+                  },
+                  "jobUrl": {
+                    "type": "string",
+                    "description": "Optional job posting URL to scrape"
+                  },
+                  "templateId": {
+                    "type": "string",
+                    "enum": [
+                      "01-executive-serif",
+                      "02-modern-minimal",
+                      "03-growth-metrics",
+                      "04-ai-product",
+                      "05-associate-onepager"
+                    ],
+                    "default": "01-executive-serif"
+                  }
+                },
+                "required": ["masterResume"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tailored resume response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobTitle": { "type": "string" },
+                    "company": { "type": "string" },
+                    "matchScore": { "type": "number" },
+                    "matchedKeywords": { "type": "array", "items": { "type": "string" } },
+                    "missingKeywords": { "type": "array", "items": { "type": "string" } },
+                    "resume": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
