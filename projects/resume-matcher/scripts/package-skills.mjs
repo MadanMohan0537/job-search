@@ -11,6 +11,16 @@ console.log('🚀 Validating Multi-Model Resume Matcher Skill Ecosystem...\n');
 
 // 1. Check required skill folders and files
 const requiredFiles = [
+  'skill/SKILL.md',
+  'skill/agents/openai.yaml',
+  'skill/references/tailoring-guide.md',
+  'skill/references/output-contract.md',
+  'skill/references/bullet-writing-formulas.md',
+  'skill/references/metrics-by-archetype.md',
+  'skill/references/template-specifications.md',
+  'skill/references/resume-structure.md',
+  'skill/references/ats-and-keywords.md',
+  'skill/references/common-mistakes.md',
   'skills/universal-prompt.md',
   'skills/claude/SKILL.md',
   'skills/chatgpt/system_prompt.md',
@@ -25,10 +35,9 @@ const requiredFiles = [
   '.windsurfrules',
   'AGENTS.md',
   '.agents/skills/resume-matcher/SKILL.md',
-  'skills/references/bullet-writing-formulas.md',
-  'skills/references/metrics-by-archetype.md',
-  'skills/references/template-specifications.md',
-  'skills/references/resume-structure.md',
+  'examples/sample-master-resume.md',
+  'examples/sample-job-posting.md',
+  'examples/sample-tailored-resume-executive.md',
 ];
 
 let allPassed = true;
@@ -64,11 +73,11 @@ const outputSkillFile = path.join(rootDir, 'resume-matcher.skill');
 
 try {
   fs.mkdirSync(tempStageDir, { recursive: true });
-  fs.copyFileSync(path.join(rootDir, 'skills/claude/SKILL.md'), path.join(tempStageDir, 'SKILL.md'));
+  fs.copyFileSync(path.join(rootDir, 'skill/SKILL.md'), path.join(tempStageDir, 'SKILL.md'));
 
   const stageRefs = path.join(tempStageDir, 'references');
   fs.mkdirSync(stageRefs, { recursive: true });
-  const srcRefs = path.join(rootDir, 'skills/references');
+  const srcRefs = path.join(rootDir, 'skill/references');
   for (const f of fs.readdirSync(srcRefs)) {
     fs.copyFileSync(path.join(srcRefs, f), path.join(stageRefs, f));
   }
@@ -76,16 +85,12 @@ try {
   if (fs.existsSync(tempZipFile)) fs.unlinkSync(tempZipFile);
   if (fs.existsSync(outputSkillFile)) fs.unlinkSync(outputSkillFile);
 
-  // Compress using PowerShell Compress-Archive to .zip
   const stageRoot = path.join(rootDir, 'dist-skills', 'stage');
   execSync(`powershell -Command "Compress-Archive -Path '${stageRoot}\\resume-matcher' -DestinationPath '${tempZipFile}' -Force"`, {
     stdio: 'inherit',
   });
 
-  // Rename .zip to .skill
   fs.renameSync(tempZipFile, outputSkillFile);
-
-  // Clean up stage folder
   fs.rmSync(path.join(rootDir, 'dist-skills'), { recursive: true, force: true });
   console.log(`\n📦 Packaged Claude Skill: ${outputSkillFile} (${(fs.statSync(outputSkillFile).size / 1024).toFixed(1)} KB)`);
 } catch (err) {
