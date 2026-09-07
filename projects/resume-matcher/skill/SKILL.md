@@ -1,57 +1,38 @@
 ---
 name: resume-matcher
-description: "Use this skill whenever the user wants to create, improve, rewrite, review, tailor, match, or ATS-optimize a resume or CV for Product Management, Software Engineering, AI/Data, or Tech roles. Triggers include 'tailor my resume', 'match my CV to this job', 'PM resume', 'tech resume', 'improve my resume', 'make it ATS-friendly', 'quantify my bullets', 'review my resume', 'build resume from scratch', 'hoja de vida', 'curriculum vitae', or pasting a job description alongside career history."
+description: Tailor, review, or rewrite a resume against a target job description while preserving factual accuracy and producing ATS-readable output. Use when a user asks to match a resume or CV to a role, identify evidence and keyword gaps, improve achievement bullets, or generate a targeted resume. Do not use for fabricating qualifications or automatically submitting applications.
 ---
 
-# Universal AI Resume Matcher & Builder (Recruiter-Grade & ATS-Guaranteed)
+# Resume Matcher
 
-## Overview
+Create a truthful, targeted resume from the candidate's source material and a job description. Work with the tools and file formats available in the current agent; do not depend on a particular model, vendor, connector, or document library.
 
-This skill transforms any messy career history or master resume into a sharp, recruiter-grade, ATS-guaranteed document tailored to a target role. Every decision is tuned for the reality of modern hiring pipelines:
-- **Recruiter Scan:** 6 to 8 seconds on first pass looking for relevant titles, scope owned, and quantified business outcomes.
-- **ATS Parsing:** Clean text extraction in Greenhouse, Lever, Workday, Ashby, Taleo, and iCIMS.
-- **Truth-Grounded Integrity:** Zero hallucination. Never fabricate metrics, employers, or credentials.
+## Inputs
 
----
+Use the candidate's resume, CV, career notes, or verified answers as the only factual source. Obtain the complete job description from supplied text, a readable attachment, or a URL the current environment can access. If either source is missing, ask only for the missing input.
 
-## Execution Flow
+## Workflow
 
-```mermaid
-flowchart TD
-    A[Read Master Resume / Career History] --> B[Analyze Target Job Posting]
-    B --> C[Diagnose Weaknesses in 3-5 Lines]
-    C --> D[Targeted Questioning: Scope & Numbers]
-    D --> E[Write Tailored Resume using XYZ & TAR Formula]
-    E --> F[Run ATS & Delivery Checklist]
-```
+1. Read both sources fully. Extract candidate evidence and job requirements separately.
+2. Diagnose the largest gaps briefly: missing evidence, weak bullets, poor hierarchy, or absent role language.
+3. Build an evidence map before rewriting. Classify each important requirement as supported, adjacent/transferable, or unsupported.
+4. Ask one batch of targeted questions only when answers could add truthful evidence or clarify ambiguous dates, scope, ownership, or outcomes.
+5. Rewrite for relevance. Reorder supported content, mirror accurate job terminology, and express achievements as action + scope + outcome. Never add a metric, tool, credential, employer, title, date, or responsibility that the source does not support.
+6. Produce a clean, single-column resume with standard headings. Prefer one page for early-career candidates and use a second page only when relevant evidence justifies it.
+7. Verify the result against the checks below. If file-generation tools exist, provide an editable format and a text-based PDF; otherwise provide well-structured Markdown and state what was not generated.
 
-### Step 1: Ingest and Diagnose
-1. Read the candidate's existing resume or career notes thoroughly.
-2. In 3-5 honest, actionable lines, tell the user what is weak:
-   - Passive duty bullets ("Responsible for...") instead of outcomes.
-   - Vague cross-functional fluff without specified results.
-   - Missing domain context lines under company names.
-   - Keyword misalignments with the target job posting.
+Read [references/tailoring-guide.md](references/tailoring-guide.md) when matching against a job. Read [references/output-contract.md](references/output-contract.md) when structured JSON or application integration is requested. The additional references in this directory provide role-specific guidance when relevant.
 
-### Step 2: Ask Targeted Clarifications (The Numbers)
-Ask 3-5 high-impact questions to turn vague points into power bullets:
-- What was the baseline and the measurable result ($ revenue, % retention, DAU/MAU, latency reduction)?
-- What scale was the product/team (users, ARR, engineering team size)?
-- Which template style does the user prefer?
-  - `01-executive-serif` (Senior/Exec/Founders)
-  - `02-modern-minimal` (Mid-level Tech/Clean default)
-  - `03-growth-metrics` (Growth, Data, & Monetization)
-  - `04-ai-product` (AI/ML, Evals, Tradeoffs)
-  - `05-associate-onepager` (Early career, Switchers)
+## Required checks
 
-### Step 3: Write Outcomes Using Proven Formulas
-- **PM TAR Formula:** `[Action Verb] + [What you shipped/owned] + [For whom / Scope] + [The measurable outcome]`
-- **Google XYZ Formula:** `Accomplished [X] as measured by [Y], by doing [Z]`
-- **Company Context Line:** 1 italicized line under each job title explaining company valuation/stage, scale, and owned surface area.
+- Every claim is traceable to the candidate's source or explicit answer.
+- Important supported requirements appear naturally; unsupported requirements are not implied.
+- Bullets describe outcomes where evidence exists and use qualitative scope where numbers do not.
+- Dates, tense, capitalization, punctuation, and section order are consistent.
+- Contact details are preserved exactly unless the user requests a change.
+- No keyword stuffing, hidden text, columns, decorative icons, skill bars, or layout tables.
+- Never claim an ATS score or guarantee interview outcomes. Explain gaps qualitatively.
 
-### Step 4: Verify Against the Delivery Checklist
-- [ ] No bullets start with "Responsible for" or "Assisted"
-- [ ] Digits used for all numbers ($500K, 24%, 3.5x, 150ms)
-- [ ] Single column layout, no tables, no icons
-- [ ] Mirror keywords authentically without keyword stuffing
-- [ ] Exactly 1 page for <5 years experience; at most 2 full pages for 5+ years
+## Delivery
+
+Return the tailored resume plus a short match note containing strengths, remaining gaps, and assumptions. Keep analysis separate from resume content. Do not send, upload, overwrite, or apply with the resume unless the user explicitly authorizes that action.
