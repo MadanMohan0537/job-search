@@ -3,12 +3,12 @@
 # 🎯 Resume Matcher
 
 ### Universal Multi-Model AI Resume Tailoring Engine & Agent Skill
-**A recruiter-grade, ATS-guaranteed resume tailoring intelligence system built to work seamlessly with ANY AI model.**
+**A recruiter-grade, ATS-oriented resume tailoring intelligence system built to work seamlessly with ANY AI model.**
 
 <p align="center">
   <a href="#-supported-ai-models--platforms"><img src="https://img.shields.io/badge/AI%20Models-Claude%20%7C%20ChatGPT%20%7C%20Gemini%20%7C%20DeepSeek%20%7C%20Ollama-blueviolet?style=for-the-badge" alt="Multi-Model AI"></a>
-  <a href="#-the-5-ats-guaranteed-templates"><img src="https://img.shields.io/badge/ATS-Guaranteed%20(5%20Templates)-0b7a52?style=for-the-badge" alt="ATS Guaranteed"></a>
-  <a href="#-privacy--zero-database-guarantee"><img src="https://img.shields.io/badge/Privacy-100%25%20Client--Side%20%26%20Zero--DB-0284c7?style=for-the-badge" alt="Private"></a>
+  <a href="#-the-5-ats-oriented-templates"><img src="https://img.shields.io/badge/ATS-Oriented%20(5%20Templates)-0b7a52?style=for-the-badge" alt="ATS Oriented"></a>
+  <a href="#-privacy-and-provider-requests"><img src="https://img.shields.io/badge/Privacy-Browser%20Storage%20%26%20Provider%20Requests-0284c7?style=for-the-badge" alt="Private"></a>
   <a href="#-continuous-integration--validation"><img src="https://img.shields.io/badge/CI-Passing%20(Agent%20Skills%20Spec)-10b981?style=for-the-badge" alt="CI Passing"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-58a6ff?style=for-the-badge" alt="MIT License"></a>
 </p>
@@ -17,13 +17,27 @@
 
 </div>
 
+## Choose a workflow and review the evidence
+
+| Goal | Entry point |
+| --- | --- |
+| Tailor in an existing chat | [Universal prompt](skills/universal-prompt.md) |
+| Try sample inputs | [Example walkthrough](examples/README.md) |
+| Run the web app | [Installation guide](docs/INSTALLATION.md) and the local-development section below |
+| Review the output schema | [Output contract](skill/references/output-contract.md) |
+| Inspect provider requests | [Worker implementation](apps/worker/src/index.ts) |
+
+Compare every generated title, date, credential and metric with the master resume before exporting. The templates favor simple, readable structure, but ATS parsing, ranking and interview outcomes vary by employer and cannot be guaranteed.
+
+
+
 ---
 
 ## 📖 Table of Contents
 
 - [Why Resume Matcher?](#-why-resume-matcher)
 - [Architecture](#-architecture)
-- [The 5 ATS-Guaranteed Templates](#-the-5-ats-guaranteed-templates)
+- [The 5 ATS-Oriented Templates](#-the-5-ats-oriented-templates)
 - [Supported AI Models & Platforms](#-supported-ai-models--platforms)
 - [Quickstart: Choose Your Surface](#-quickstart-choose-your-surface)
   - [1. Universal Zero-Install Prompt](#1-universal-zero-install-prompt-any-llm)
@@ -39,7 +53,7 @@
 - [Real-World Examples](#-real-world-examples)
 - [Knowledge Base & References](#-knowledge-base--references)
 - [Continuous Integration & Validation](#-continuous-integration--validation)
-- [Privacy & Zero-Database Guarantee](#-privacy--zero-database-guarantee)
+- [Privacy and provider requests](#-privacy-and-provider-requests)
 - [License](#-license)
 
 ---
@@ -52,7 +66,7 @@ Most resume optimization tools suffer from two major flaws:
 
 **Resume Matcher solves both problems:**
 - **Truly Multi-Model:** Operates interchangeably across **Anthropic Claude**, **OpenAI ChatGPT / Codex**, **Google Gemini**, **DeepSeek**, **Local Open-Source LLMs (Ollama/LM Studio)**, and **Agentic IDEs (Cursor/Windsurf/Antigravity)**.
-- **Strict Evidence-Grounded Truth:** The candidate's master resume is the **sole factual source**. It reorders, reframes, and highlights verified evidence using the **Google XYZ formula** and **PM TAR formula** without ever fabricating credentials, metrics, or employers.
+- **Strict Evidence-Grounded Truth:** The candidate's master resume is the **sole factual source**. It reorders, reframes, and highlights verified evidence using the **Google XYZ formula** and **PM TAR formula** with instructions to preserve credentials, metrics and employers; review model output against the source.
 - **Dual-Mode Flexibility:** Use it as a lightweight **portable agent skill** in your favorite AI chat/editor, OR run the **private full-stack web application** powered by Cloudflare Workers and React.
 
 ---
@@ -99,9 +113,9 @@ flowchart TD
 
 ---
 
-## 📄 The 5 ATS-Guaranteed Templates
+## 📄 The 5 ATS-Oriented Templates
 
-Every template is single-column, standard font, graphics-free, and verified to parse cleanly across Greenhouse, Lever, Workday, Ashby, Taleo, and iCIMS.
+Every template is single-column, standard font, graphics-free, and designed for straightforward parsing. Verify the exported document in the target application; no cross-platform parsing guarantee is established here.
 
 | Preview | Template | Best For | Styling & Typography Details |
 |---|---|---|---|
@@ -268,7 +282,7 @@ npx wrangler secret put DEEPSEEK_API_KEY
 ## 🎯 Evidence-Grounded Tailoring Philosophy
 
 1. **The 6–8 Second Recruiter Scan:** Recruiters prioritize titles, owned scope, and quantified outcomes over passive duties.
-2. **Zero Hallucination Guarantee:** The candidate's master resume is the sole factual source. The engine never invents employers, titles, dates, degrees, certifications, skills, tools, or metrics.
+2. **Evidence boundary:** The candidate's master resume is the intended factual source. Check the output for invented employers, titles, dates, degrees, certifications, skills, tools or metrics before using it.
 3. **The Google XYZ Formula:** Every achievement bullet follows:
    $$\text{"Accomplished [X] as measured by [Y], by doing [Z]"}$$
 4. **The PM TAR Formula:**
@@ -332,10 +346,10 @@ GitHub Actions automatically runs these validations on all pushes and pull reque
 
 ---
 
-## 🔒 Privacy & Zero-Database Guarantee
+## 🔒 Privacy and provider requests
 
 1. **No Central Database:** Your master resume is stored exclusively in your local browser storage (`localStorage`).
-2. **Encrypted BYOK Security:** User-provided API keys are sent over encrypted HTTPS directly to the selected model provider and are never logged or persisted.
+2. **Provider requests:** The web app sends resume context and request credentials through the Worker to the selected provider. BYOK settings may be retained in browser `localStorage`; avoid shared browsers, clear stored settings when finished and review the provider's data policy.
 3. **SSRF Guard:** Job URL fetching automatically rejects private or local hostnames (`localhost`, `127.0.0.1`, `.local`).
 4. **ATS Plain-Text Export:** Allows copying clean, structured text directly for application portals without formatting glitches.
 
