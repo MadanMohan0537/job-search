@@ -1,9 +1,16 @@
-name: 'CodeQL Analysis'
+name: Job Copilot CodeQL
+
 on:
   push:
     branches: [main]
+    paths:
+      - 'projects/job-copilot/**'
+      - '.github/workflows/job-copilot-codeql.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'projects/job-copilot/**'
+      - '.github/workflows/job-copilot-codeql.yml'
   schedule:
     - cron: '0 4 * * 1' # Weekly Monday 4am UTC
 
@@ -33,8 +40,8 @@ jobs:
         if: matrix.language == 'go'
         uses: actions/setup-go@v7
         with:
-          go-version-file: dashboard/go.mod
-          cache-dependency-path: dashboard/go.sum
+          go-version-file: projects/job-copilot/dashboard/go.mod
+          cache-dependency-path: projects/job-copilot/dashboard/go.sum
 
       - name: Build Go
         if: matrix.language == 'go'
@@ -43,7 +50,7 @@ jobs:
         # test packages without running them (-run '^$') lets the extractor
         # cover them too. The two windows-tagged files stay out by platform.
         run: |
-          cd dashboard
+          cd projects/job-copilot/dashboard
           go build ./...
           go test -run '^$' ./...
 

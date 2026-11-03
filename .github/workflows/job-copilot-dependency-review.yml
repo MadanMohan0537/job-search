@@ -1,7 +1,11 @@
-name: Dependency Review
+name: Job Copilot dependency review
+
 on:
   pull_request:
     branches: [main]
+    paths:
+      - 'projects/job-copilot/**'
+      - '.github/workflows/job-copilot-dependency-review.yml'
 
 permissions:
   contents: read
@@ -16,7 +20,7 @@ jobs:
 
       - name: Dependency Review
         # TODO: remove continue-on-error once the Dependency graph is enabled in
-        # Settings > Security & Analysis (see #343). Until then, this is a temporary
+        # Settings > Security & Analysis. Until then, this is a temporary
         # workaround to unblock PRs — note that fail-on-severity: high is still
         # configured but will not block merges while continue-on-error is true.
         continue-on-error: true

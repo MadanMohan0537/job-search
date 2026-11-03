@@ -16,13 +16,27 @@
       "automerge": false
     },
     {
+      "matchFileNames": ["projects/job-copilot/dashboard/**"],
       "matchManagers": ["gomod"],
-      "groupName": "Go dependencies",
+      "groupName": "job-copilot Go dependencies",
       "automerge": false
     },
     {
+      "matchFileNames": ["projects/job-copilot/web/**"],
       "matchManagers": ["npm"],
-      "groupName": "npm dependencies",
+      "groupName": "job-copilot web npm",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/job-copilot/package.json"],
+      "matchManagers": ["npm"],
+      "groupName": "job-copilot npm",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/resume-matcher/**"],
+      "matchManagers": ["npm"],
+      "groupName": "resume-matcher npm",
       "automerge": false
     }
   ]

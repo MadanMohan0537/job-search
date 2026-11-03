@@ -1,0 +1,37 @@
+name: Job Copilot web CI
+
+# CI for the experimental web UI (projects/job-copilot/web). Informative by
+# design: it is NOT a required check for the core — a red here never blocks a
+# core merge, and core changes never trigger it.
+on:
+  pull_request:
+    paths:
+      - 'projects/job-copilot/web/**'
+      - '.github/workflows/job-copilot-web-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'projects/job-copilot/web/**'
+      - '.github/workflows/job-copilot-web-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: web typecheck + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/job-copilot/web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: projects/job-copilot/web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run build

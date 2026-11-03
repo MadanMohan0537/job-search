@@ -1,0 +1,64 @@
+name: Resume Matcher CI
+
+on:
+  push:
+    paths:
+      - 'projects/resume-matcher/**'
+      - '.github/workflows/resume-matcher-ci.yml'
+  pull_request:
+    paths:
+      - 'projects/resume-matcher/**'
+      - '.github/workflows/resume-matcher-ci.yml'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/resume-matcher
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: projects/resume-matcher/package-lock.json
+      - run: npm ci
+      - run: npm run validate:skill
+      - run: npm run build
+
+  no-personal-data:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number, per_page: 100,
+            });
+            const BLOCKED = [
+              /^projects\/resume-matcher\/resume\//,
+              /^projects\/resume-matcher\/output\//,
+              /^projects\/resume-matcher\/data\//,
+              /^projects\/resume-matcher\/tailored\//,
+              /(^|\/)\.env$/,
+              /(^|\/)\.dev\.vars$/,
+              /R1605351/,
+            ];
+            const bad = files
+              .filter((f) => f.status !== 'removed')
+              .map((f) => f.filename)
+              .filter((f) => BLOCKED.some((re) => re.test(f)));
+            if (bad.length) {
+              core.setFailed(
+                'This PR adds personal resume or secret files under projects/resume-matcher.\n' +
+                bad.join('\n')
+              );
+            }

@@ -1,0 +1,143 @@
+# Root ignore rules for the job-search monorepo.
+# Each project also has its own .gitignore. Rules here apply repo-wide.
+# Project-specific exceptions (for example Job Copilot's tracked test fixtures,
+# and the fact that only web/package-lock.json is committed inside Job Copilot)
+# stay in that project's .gitignore.
+#
+# This file does not un-ignore a package-lock.json globally: Job Copilot ignores
+# its own root lockfile via projects/job-copilot/.gitignore and keeps
+# projects/job-copilot/web/package-lock.json.
+
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+**/.env.local
+**/.env*.local
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.mcp.json
+opencode.json
+
+# ── Personal job-search data (never commit) ──────────────────────────────────
+cv.md
+article-digest.md
+*.bak*
+
+# Tailored-resume generators and personal batch outputs removed at import.
+generate_all_pdfs.mjs
+generate_all_cl_pdfs.mjs
+batch/processed-batch*.json
+**/*R1605351*
+
+# Identity documents
+*passport*
+*diploma*
+*简历*
+*学位*
+*成绩单*
+
+# User layer. Tracked .gitkeep / README scaffolding can still be committed
+# because those files are already in the index; new personal files are ignored.
+# Nested negations in projects/job-copilot/.gitignore re-include fixtures.
+data/*
+!data/.gitkeep
+!data/offers/
+!data/parser-output/
+data/offers/*
+!data/offers/.gitkeep
+data/parser-output/**
+!data/parser-output/**/
+!data/parser-output/.gitkeep
+!data/parser-output/**/.gitkeep
+data/model-blacklist.json
+data/intake-state.json
+
+reports/*
+!reports/.gitkeep
+reports/application-dashboard.html
+reports/*-RESERVED.md
+
+output/*
+!output/.gitkeep
+
+batch/logs/*
+!batch/logs/.gitkeep
+batch/batch-state.tsv
+batch/batch-state-recovery.d/
+batch/batch-input.tsv
+batch/tracker-additions/**/*.tsv
+!batch/tracker-additions/.gitkeep
+
+jds/*
+!jds/.gitkeep
+
+interview-prep/*
+!interview-prep/
+!interview-prep/.gitkeep
+!interview-prep/sessions/
+interview-prep/sessions/*
+!interview-prep/sessions/.gitkeep
+!interview-prep/sessions/README.md
+
+writing-samples/*
+!writing-samples/README.md
+
+documents/*
+!documents/.gitkeep
+!documents/README.md
+
+local/
+plan/
+
+# User config (copy from the tracked *.example files)
+config/profile.yml
+config/cv-facts.json
+config/benchmarks.yml
+config/plugins.yml
+portals.yml
+modes/_profile.md
+modes/_custom.md
+modes/_brief.md
+plugins.local/
+plugins.lock
+.update-dismissed
+.update-lock
+.manifesto-noted
+
+# ── Generated / tooling ──────────────────────────────────────────────────────
+node_modules/
+dist/
+.wrangler/
+**/*.tsbuildinfo
+.resolved-prompt-*
+.tmp-script-test-*/
+test-results/
+playwright-report/
+.playwright-mcp/
+.career-ops-web/
+.next/
+out/
+coverage/
+*.log
+
+career-dashboard
+career-dashboard.exe
+bun.lock
+
+# ── OS / IDE ─────────────────────────────────────────────────────────────────
+.DS_Store
+*.mov
+*.mp4
+.idea/
+.vscode/
+.claude/settings.local.json
+.claude/memory/
+.opencode/settings.local.json
+.opencode/memory/
+
+# Job Copilot upgrade fixtures are fictional system data. The project
+# .gitignore re-includes them; repeat that here so a root `cv.md` rule
+# does not hide tracked fixtures from status once they are untracked.
+!projects/job-copilot/test-fixtures/**
