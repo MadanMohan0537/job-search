@@ -1,0 +1,4 @@
+AI_PROVIDER=openai-compatible
+AI_API_KEY=replace-me
+AI_MODEL=gpt-4.1-mini
+AI_BASE_URL=https://api.openai.com/v1
