@@ -6,11 +6,13 @@ on:
     paths:
       - 'projects/job-copilot/**'
       - '.github/workflows/job-copilot-codeql.yml'
+      - '.github/codeql/codeql-config.yml'
   pull_request:
     branches: [main]
     paths:
       - 'projects/job-copilot/**'
       - '.github/workflows/job-copilot-codeql.yml'
+      - '.github/codeql/codeql-config.yml'
   schedule:
     - cron: '0 4 * * 1' # Weekly Monday 4am UTC
 
@@ -35,6 +37,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
+          config-file: ./.github/codeql/codeql-config.yml
 
       - name: Setup Go
         if: matrix.language == 'go'
