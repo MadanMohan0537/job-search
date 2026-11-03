@@ -10,17 +10,17 @@
     "deploy": "vite build && wrangler deploy"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "jspdf": "latest",
-    "pdfjs-dist": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "@vitejs/plugin-react": "*",
+    "jspdf": "*",
+    "pdfjs-dist": "*",
+    "react": "*",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "typescript": "latest",
-    "vite": "latest",
-    "wrangler": "latest"
+    "@types/react": "*",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "*",
+    "vite": "*",
+    "wrangler": "*"
   }
 }
