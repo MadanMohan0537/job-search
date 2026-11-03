@@ -117,6 +117,8 @@ Every evaluated role produces a comprehensive report with multi-dimensional scor
 - **Package Manager:** `npm` or `bun`
 - **AI CLI:** [Claude Code](https://claude.ai/code), [Antigravity CLI](https://antigravity.google), [OpenAI Codex](https://github.com/openai/codex), or any Open Agent Skill CLI.
 
+Codex reads [CODEX.md](CODEX.md). Start an interactive session with `codex`. Slash commands are not guaranteed in Codex, so name the mode in a plain language prompt if `/career-ops` is unavailable (`Run the career-ops scan mode`). For one-shot workers, use `codex exec` with the same prompt. See [docs/CODEX.md](docs/CODEX.md).
+
 ### 2. Installation
 
 ```bash

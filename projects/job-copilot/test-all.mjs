@@ -12208,15 +12208,27 @@ try {
     fail('AGENTS.md custom-rule source boundary or CLAUDE.md inheritance is incomplete (#1198, #1736)');
   }
 
-  const noUserData = readFileSync(join(ROOT, '.github/workflows/no-user-data.yml'), 'utf-8');
-  const guardedPaths = (noUserData.match(/const USER_PATHS = \[([\s\S]*?)\];/) || [, ''])[1];
-  if (
-    guardedPaths.includes('/^modes\\/_custom\\.md$/') &&
-    !guardedPaths.includes('/^voice-dna\\.md$/')
-  ) {
-    pass('no-user-data guard protects modes/_custom.md without treating voice-dna.md as user data');
+  // GitHub only runs workflows from the monorepo root. A standalone checkout
+  // still keeps the original path. Accept either, including the prefixed
+  // user-layer pattern the root workflow uses.
+  const workflowCandidates = [
+    join(ROOT, '.github/workflows/no-user-data.yml'),
+    join(ROOT, '..', '..', '.github/workflows/job-copilot-no-user-data.yml'),
+  ];
+  const workflowPath = workflowCandidates.find((p) => existsSync(p));
+  if (!workflowPath) {
+    fail('no-user-data workflow not found next to the project or at the monorepo root');
   } else {
-    fail('no-user-data guard has the wrong custom/user-layer paths (#1736)');
+    const noUserData = readFileSync(workflowPath, 'utf-8');
+    const guardedPaths = (noUserData.match(/const USER_PATHS = \[([\s\S]*?)\];/) || [, ''])[1];
+    const guardsCustom = guardedPaths.includes('/^modes\\/_custom\\.md$/')
+      || guardedPaths.includes('/^projects\\/job-copilot\\/modes\\/_custom\\.md$/');
+    const guardsVoice = /voice-dna\\.md/.test(guardedPaths);
+    if (guardsCustom && !guardsVoice) {
+      pass('no-user-data guard protects modes/_custom.md without treating voice-dna.md as user data');
+    } else {
+      fail('no-user-data guard has the wrong custom/user-layer paths (#1736)');
+    }
   }
 } catch (e) {
   fail(`custom instructions test crashed: ${e.message}`);

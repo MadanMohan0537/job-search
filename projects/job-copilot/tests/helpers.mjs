@@ -175,6 +175,11 @@ export function run(cmd, args = [], opts = {}) {
   lastFailure = null;
   const exe = resolveAllowedExecutable(cmd);
   try {
+    // Executable is the allowlist return value, never the caller string.
+    // Arguments stay an argv vector (no shell). CodeQL still treats both as
+    // uncontrolled because they are variables; the allowlist above is the control.
+    // codeql[js/command-line-injection]
+    // codeql[js/shell-command-injection-from-environment]
     return execFileSync(exe, args, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
   } catch (e) {
     // execFileSync attaches the child's streams and exit status to the error.

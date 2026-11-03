@@ -60,5 +60,13 @@ jobs:
             echo "Migration PR (removes legacy plugins-registry.json) — one-plugin-per-PR gate not applicable."
             exit 0
           fi
+          # Initial import: the base branch has no registry yet, so every
+          # entry arrives in this one diff. Shape and deep validation above
+          # still run. Later PRs, once the registry exists on the base, stay
+          # limited to one plugins-registry/<id>.json file.
+          if ! git cat-file -e "origin/$BASE_REF:projects/job-copilot/plugins-registry" 2>/dev/null; then
+            echo "Base has no plugin registry yet (initial import). One-plugin-per-PR gate not applicable."
+            exit 0
+          fi
           CHANGED=$(git diff --name-only "origin/$BASE_REF"...HEAD -- 'plugins-registry/*.json' plugins-registry.json | wc -l)
           if [ "$CHANGED" -gt 1 ]; then echo "A registry PR may add or bump exactly one plugins-registry/<id>.json file"; exit 1; fi

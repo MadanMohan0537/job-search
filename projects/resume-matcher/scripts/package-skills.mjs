@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -86,7 +86,10 @@ try {
   if (fs.existsSync(outputSkillFile)) fs.unlinkSync(outputSkillFile);
 
   const stageRoot = path.join(rootDir, 'dist-skills', 'stage');
-  execSync(`powershell -Command "Compress-Archive -Path '${stageRoot}\\resume-matcher' -DestinationPath '${tempZipFile}' -Force"`, {
+  // Argument vector, not a shell string: paths come from this script's own
+  // directory and must not be interpolated into a command line.
+  execFileSync('python3', ['-m', 'zipfile', '-c', tempZipFile, 'resume-matcher'], {
+    cwd: stageRoot,
     stdio: 'inherit',
   });
 

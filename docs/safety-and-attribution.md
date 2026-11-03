@@ -29,6 +29,8 @@ No verified secrets were found. Remaining gitleaks hits are test fixtures and a 
 
 Example env files that remain are placeholders (`your_gemini_api_key_here`, `AI_API_KEY=replace-me`, `VITE_API_URL=http://localhost:8787`).
 
+Follow-up on the import branch, removed from the tree (still in earlier commits, not personal contact data): `modes/_custom.md` is user-layer house rules, so the no-user-data guard keeps blocking that path and only `modes/_custom.template.md` stays tracked. `batch/append-scan-results.mjs` and `batch/sync-completed-reports.mjs` are one-off dumps of a specific search, including apply/skip notes, and are not product source.
+
 ## Attribution
 
 Job Copilot builds on Career-Ops by santifer, MIT. Keep [`projects/job-copilot/LICENSE`](../projects/job-copilot/LICENSE), [`CITATION.cff`](../projects/job-copilot/CITATION.cff), and [`CONTRIBUTORS.md`](../projects/job-copilot/CONTRIBUTORS.md) with that tree. Do not describe the monorepo as the author of the upstream engine.
