@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Job Copilot root package (no lockfile committed; package.json ranges only)
+  - package-ecosystem: "npm"
+    directory: "/projects/job-copilot"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Job Copilot Next.js app (own lockfile)
+  - package-ecosystem: "npm"
+    directory: "/projects/job-copilot/web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Resume Matcher workspace (root lockfile covers apps/web and apps/worker)
+  - package-ecosystem: "npm"
+    directory: "/projects/resume-matcher"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "gomod"
+    directory: "/projects/job-copilot/dashboard"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "group:allNonMajor",
+    ":semanticCommits"
+  ],
+  "labels": ["dependencies"],
+  "schedule": ["before 7am on monday"],
+  "prHourlyLimit": 3,
+  "prConcurrentLimit": 5,
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/job-copilot/dashboard/**"],
+      "matchManagers": ["gomod"],
+      "groupName": "job-copilot Go dependencies",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/job-copilot/web/**"],
+      "matchManagers": ["npm"],
+      "groupName": "job-copilot web npm",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/job-copilot/package.json"],
+      "matchManagers": ["npm"],
+      "groupName": "job-copilot npm",
+      "automerge": false
+    },
+    {
+      "matchFileNames": ["projects/resume-matcher/**"],
+      "matchManagers": ["npm"],
+      "groupName": "resume-matcher npm",
+      "automerge": false
+    }
+  ]
+}

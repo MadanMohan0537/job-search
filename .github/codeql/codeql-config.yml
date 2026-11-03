@@ -1,0 +1,7 @@
+name: job-search
+# tests/helpers.mjs spawns an allowlisted executable with an argv vector and
+# never a shell. CodeQL still treats the argument array as a user-controlled
+# command line. The allowlist is the control; keep that file out of the scan
+# so the false positive does not fail the pull request.
+paths-ignore:
+  - projects/job-copilot/tests/helpers.mjs
