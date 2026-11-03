@@ -39,8 +39,8 @@ const json = (data: unknown, status = 200, origin = '*') =>
 
 const cleanHtml = (html: string) =>
   html
-    .replace(/<script[\s\S]*?<\/script\s*>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style\s*>/gi, ' ')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')

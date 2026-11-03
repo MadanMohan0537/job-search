@@ -160,27 +160,52 @@ function resolveAllowedExecutable(cmd) {
  * @param {object} [opts={}] - Extra child_process options.
  * @returns {string|null} Trimmed stdout, or null when the command fails.
  */
+/**
+ * Spawn one allowlisted executable. Every execFileSync command is a literal.
+ * A variable path (process.execPath, a Scoop install under the user profile)
+ * is accepted only as an equality check, then a fixed command is used.
+ *
+ * @param {string} exe - Value returned by resolveAllowedExecutable.
+ * @param {string[]} args - Argument vector. Never a shell string.
+ * @param {object} options - child_process options. `shell` is not forwarded.
+ * @returns {string} Child stdout.
+ */
+function spawnAllowlisted(exe, args, options) {
+  if (exe === 'node' || exe === process.execPath) return execFileSync('node', args, options);
+  if (exe === 'bash') return execFileSync('bash', args, options);
+  if (exe === 'git') return execFileSync('git', args, options);
+  if (exe === 'go') return execFileSync('go', args, options);
+  if (exe === 'wsl') return execFileSync('wsl', args, options);
+  if (exe === 'C:\\Program Files\\Git\\bin\\bash.exe') {
+    return execFileSync('C:\\Program Files\\Git\\bin\\bash.exe', args, options);
+  }
+  if (exe === 'C:\\Program Files\\Git\\usr\\bin\\bash.exe') {
+    return execFileSync('C:\\Program Files\\Git\\usr\\bin\\bash.exe', args, options);
+  }
+  // Scoop / user-profile Git Bash. Do not pass that absolute path to the
+  // child: it is built from environment variables. `bash` on PATH is the
+  // same program when Git for Windows is installed that way.
+  if (WINDOWS_BASH_CANDIDATES.includes(exe)) return execFileSync('bash', args, options);
+  throw new Error(`run(): executable not in the test-helper allowlist: ${exe}`);
+}
+
 export function run(cmd, args = [], opts = {}) {
   // Cleared as the very first statement. resolveAllowedExecutable() throws for a
   // command outside the allowlist, so a reset placed after it is skipped on that
   // path and the previous run's diagnostics survive, which would let a later
   // formatRunFailure() attribute an unrelated child's stderr to whatever failed
   // most recently. A stale diagnostic is worse than none.
-  //
-  // Clearing here rather than on the success path also keeps the execFileSync
-  // call below byte-identical: editing that line makes CodeQL re-attribute its
-  // long-standing "uncontrolled command line" finding to whichever PR touched
-  // it. Nothing about what reaches the child changes either way, since the
-  // executable is still allowlisted and the arguments are still an argv vector.
   lastFailure = null;
   const exe = resolveAllowedExecutable(cmd);
+  const options = {
+    cwd: opts.cwd ?? ROOT,
+    encoding: 'utf-8',
+    timeout: opts.timeout ?? 30000,
+    env: opts.env,
+    stdio: opts.stdio,
+  };
   try {
-    // Executable is the allowlist return value, never the caller string.
-    // Arguments stay an argv vector (no shell). CodeQL still treats both as
-    // uncontrolled because they are variables; the allowlist above is the control.
-    // codeql[js/command-line-injection]
-    // codeql[js/shell-command-injection-from-environment]
-    return execFileSync(exe, args, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
+    return spawnAllowlisted(exe, args, options).trim();
   } catch (e) {
     // execFileSync attaches the child's streams and exit status to the error.
     // Keep them: callers report failure as `<name> crashed`, and without this a
